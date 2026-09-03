@@ -1,0 +1,2 @@
+import {Router} from "express"; import * as c from "../controllers/productController.js"; import {protect,adminOnly} from "../middleware/auth.js";
+const r=Router();r.get("/",c.getProducts);r.get("/categories",c.getCategories);r.get("/:id/related",c.getRelatedProducts);r.get("/:id",c.getProduct);r.post("/",protect,adminOnly,c.createProduct);r.patch("/:id",protect,adminOnly,c.updateProduct);r.delete("/:id",protect,adminOnly,c.deleteProduct);export default r;

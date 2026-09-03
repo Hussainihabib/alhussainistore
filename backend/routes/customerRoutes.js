@@ -1,0 +1,1 @@
+import {Router} from "express";import {protect} from "../middleware/auth.js";import {createSupport,mySupport,submitContactForm} from "../controllers/customerController.js";const r=Router();r.post("/contact",submitContactForm);r.use(protect);r.post("/support",createSupport);r.get("/support",mySupport);export default r;
