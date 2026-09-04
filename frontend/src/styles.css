@@ -1,4 +1,160 @@
-@tailwind base;@tailwind components;@tailwind utilities;
-*{box-sizing:border-box}body{margin:0;font-family:Inter,ui-sans-serif,system-ui,sans-serif;background:#F8F7F4;color:#252027}button,input,select,textarea{font:inherit}.container{width:min(1180px,92%);margin:auto}.card{@apply bg-white rounded-2xl shadow-luxury border border-stone-100}.btn{@apply inline-flex items-center justify-center rounded-xl px-4 py-3 font-semibold transition}.btn-brand{@apply btn bg-brand text-white hover:opacity-90}.btn-gold{@apply btn bg-gold text-brand}.field{@apply w-full rounded-xl border border-stone-300 px-3 py-3 outline-none focus:ring-2 focus:ring-brand/20}.admin-table th,.admin-table td{@apply px-3 py-3 text-left border-b border-stone-100}.admin-table{width:100%;border-collapse:collapse}
-html,body,#root{min-height:100%}img{max-width:100%;height:auto}
-@media(max-width:640px){.container{width:min(94%,1180px)}.admin-table th,.admin-table td{padding:.65rem;font-size:.82rem}.field{min-height:44px}.btn,.btn-brand,.btn-gold{min-height:44px}}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* =========================================
+   GLOBAL RESET
+========================================= */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  width: 100%;
+  min-height: 100%;
+  margin: 0;
+  padding: 0;
+  max-width: 100%;
+}
+
+html,
+body {
+  overflow-x: hidden;
+}
+
+body {
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+  background: #F8F7F4;
+  color: #252027;
+}
+
+/* Prevent any child from creating horizontal overflow */
+#root {
+  overflow-x: hidden;
+}
+
+/* =========================================
+   MEDIA
+========================================= */
+
+img,
+video,
+svg,
+canvas {
+  max-width: 100%;
+  height: auto;
+}
+
+/* =========================================
+   FORM ELEMENTS
+========================================= */
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+input,
+select,
+textarea {
+  max-width: 100%;
+}
+
+/* =========================================
+   CONTAINER
+========================================= */
+
+.container {
+  width: min(1180px, 92%);
+  max-width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* =========================================
+   CARD
+========================================= */
+
+.card {
+  @apply bg-white rounded-2xl shadow-luxury border border-stone-100;
+}
+
+/* =========================================
+   BUTTONS
+========================================= */
+
+.btn {
+  @apply inline-flex items-center justify-center rounded-xl px-4 py-3 font-semibold transition;
+}
+
+.btn-brand {
+  @apply btn bg-brand text-white hover:opacity-90;
+}
+
+.btn-gold {
+  @apply btn bg-gold text-brand;
+}
+
+/* =========================================
+   FORM FIELDS
+========================================= */
+
+.field {
+  @apply w-full rounded-xl border border-stone-300 px-3 py-3 outline-none focus:ring-2 focus:ring-brand/20;
+}
+
+/* =========================================
+   ADMIN TABLE
+========================================= */
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.admin-table th,
+.admin-table td {
+  @apply px-3 py-3 text-left border-b border-stone-100;
+}
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media (max-width: 640px) {
+  html,
+  body,
+  #root {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  .container {
+    width: 94%;
+    max-width: 100%;
+  }
+
+  .admin-table th,
+  .admin-table td {
+    padding: 0.65rem;
+    font-size: 0.82rem;
+  }
+
+  .field {
+    min-height: 44px;
+  }
+
+  .btn,
+  .btn-brand,
+  .btn-gold {
+    min-height: 44px;
+  }
+}
