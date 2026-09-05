@@ -18,6 +18,7 @@ import {
   sendNewOrderAdminEmail,
   sendOrderCancellationCustomerEmail,
   sendOrderCancellationAdminEmail,
+  sendOrderStatusUpdateEmail,
 } from "../utils/email.js";
 
 const shippingFor = async (city, subtotal) => {
@@ -381,6 +382,15 @@ export const updateOrder = async (req, res) => {
 
   await order.save();
 
+  if (
+      req.body.status &&
+      req.body.status !== old
+    ) {
+      sendOrderStatusUpdateEmail(
+        order,
+        old
+      ).catch(() => {});
+    }
   res.json(order);
 };
 

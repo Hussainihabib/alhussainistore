@@ -368,9 +368,7 @@ export const sendOrderConfirmationEmail = async (order) => {
             border-bottom:1px solid #eee;
             text-align:right;
           ">
-            PKR ${(
-              i.price * i.quantity
-            ).toLocaleString()}
+            PKR ${(i.price * i.quantity).toLocaleString()}
           </td>
         </tr>
       `
@@ -420,17 +418,13 @@ export const sendOrderConfirmationEmail = async (order) => {
         }
 
         Shipping:
-        PKR ${Number(
-          order.shippingAmount || 0
-        ).toLocaleString()}
+        PKR ${Number(order.shippingAmount || 0).toLocaleString()}
 
         <br/>
 
         <b>
           Total:
-          PKR ${Number(
-            order.totalAmount || 0
-          ).toLocaleString()}
+          PKR ${Number(order.totalAmount || 0).toLocaleString()}
         </b>
       </p>
 
@@ -1114,4 +1108,110 @@ export const sendOrderCancellationAdminEmail = async (order) => {
     subject: `⚠️ Order Cancelled — ${order.orderId}`,
     html,
   });
+};
+
+/* =========================================================
+   PHASE 6
+   ADMIN STATUS UPDATE → CUSTOMER
+========================================================= */
+
+export const sendOrderStatusUpdateEmail = async (order, oldStatus) => {
+  // 1. Debugging Log
+  console.log(`[EMAIL TRIGGERED] Order ID: ${order?.orderId}, Status: ${order?.status}`);
+
+  // 2. Email Validation Check
+  if (!order?.email) {
+    console.error("❌ Email failed: Customer email is missing from order object.");
+    return { sent: false, error: "Missing email address" };
+  }
+
+  const customerName = order.customerName || "Dear Customer";
+  const newStatus = order.status || "Updated";
+  const orderId = order.orderId || order._id || "N/A";
+  const statusDate = new Date().toLocaleString();
+
+  const isCancelled = newStatus.toLowerCase() === "cancelled";
+
+  // Dynamic status messages for better UX
+  let statusMessage = `Your order status has been updated from <strong>${oldStatus || "Previous Status"}</strong> to <strong>${newStatus}</strong>.`;
+  
+  if (isCancelled) {
+    statusMessage = "Your order has been cancelled by our team.";
+  } else if (newStatus.toLowerCase() === "shipped") {
+    statusMessage = "Great news! Your order has been shipped and is on its way.";
+  } else if (newStatus.toLowerCase() === "out for delivery") {
+    statusMessage = "Your package is out for delivery and will reach you soon!";
+  }
+
+  const html = getEmailWrapper({
+    title: isCancelled
+      ? "Order Status Updated — Cancelled ❌"
+      : `Order Status Updated — ${newStatus} 📦`,
+
+    content: `
+      <p style="font-size:16px; line-height:1.7;">
+        Dear <strong>${customerName}</strong>,
+      </p>
+
+      <p style="font-size:16px; line-height:1.7;">
+        ${statusMessage}
+      </p>
+
+      <div style="background:#f8f7f4; border-left:4px solid ${isCancelled ? '#c0392b' : '#FFD700'}; padding:18px; margin:20px 0; border-radius:6px;">
+        <p style="margin:0 0 10px;"><strong>Order ID:</strong> ${orderId}</p>
+        <p style="margin:0 0 10px;"><strong>Previous Status:</strong> ${oldStatus || "-"}</p>
+        <p style="margin:0 0 10px;"><strong>Current Status:</strong> ${newStatus}</p>
+        <p style="margin:0;"><strong>Updated At:</strong> ${statusDate}</p>
+      </div>
+
+      ${
+        order.trackingNo || order.courier
+          ? `
+            <div style="background:#f8f7f4; padding:18px; border-radius:8px; margin-top:20px;">
+              <h3 style="margin-top:0; color:#581845;">Delivery Information</h3>
+              ${order.trackingNo ? `<p style="margin:6px 0;"><strong>Tracking Number:</strong> ${order.trackingNo}</p>` : ""}
+              ${order.courier ? `<p style="margin:6px 0;"><strong>Courier:</strong> ${order.courier}</p>` : ""}
+              ${order.courierNotes ? `<p style="margin:6px 0; line-height:1.6;"><strong>Courier Notes:</strong> ${order.courierNotes}</p>` : ""}
+            </div>
+          `
+          : ""
+      }
+
+      ${
+        isCancelled && order.cancellationReason
+          ? `
+            <div style="background:#fff7f7; border-left:4px solid #c0392b; padding:18px; margin-top:20px; border-radius:6px;">
+              <p style="margin:0;"><strong>Cancellation Reason:</strong> ${order.cancellationReason}</p>
+            </div>
+          `
+          : ""
+      }
+
+      <div style="background:#f8f7f4; padding:18px; border-radius:8px; margin-top:20px;">
+        <p style="margin:5px 0;"><strong>Order Total:</strong> PKR ${Number(order.totalAmount || 0).toLocaleString()}</p>
+        <p style="margin:5px 0;"><strong>Payment Method:</strong> ${order.paymentMethod || "-"}</p>
+        <p style="margin:5px 0;"><strong>Payment Status:</strong> ${order.paymentStatus || "-"}</p>
+      </div>
+
+      <p style="margin-top:22px; font-size:15px; line-height:1.7; color:#555;">
+        You can use your Order ID <strong>${orderId}</strong> to track your order.
+      </p>
+
+      <p style="margin-top:25px; font-size:16px;">
+        Thank you for shopping with us.<br/>
+        <strong>Al-Hussaini Garments Team</strong>
+      </p>
+    `,
+  });
+
+  try {
+    return await sendEmail({
+      to: order.email,
+      subject: `Order Update [${newStatus}] — ${orderId}`,
+      html,
+    });
+  } catch (error) {
+    console.error("❌ Email sending failed:", error);
+    return { sent: false, error };
+  }
 };
